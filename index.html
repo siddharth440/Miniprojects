@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spendwise — Personal Expense Tracker</title>
+    <meta name="description" content="A clean, modern personal expense tracker. Log income and expenses, visualize spending, and stay on budget." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <!-- HEADER -->
+    <header class="header glass">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-20"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 1 0-4h3"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          </div>
+          <div>
+            <h1 class="brand-title">Spendwise</h1>
+            <p class="brand-sub">Personal expense tracker</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <div class="month-nav">
+            <button id="prevMonth" aria-label="Previous month" class="month-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-16"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <span id="monthLabel" class="month-label"></span>
+            <button id="nextMonth" aria-label="Next month" class="month-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-16"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+          <button id="addBtnDesktop" class="btn-add-desktop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-16"><path d="M12 5v14M5 12h14"/></svg>
+            Add
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div id="errorBanner" class="error-banner hidden"></div>
+
+      <!-- STATS -->
+      <div class="stats-row" id="statsRow"></div>
+
+      <!-- TREND CHART -->
+      <div class="card trend-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Daily trend</h2>
+            <p class="card-sub">Income vs expenses over time</p>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-20 text-muted-light"><path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/></svg>
+        </div>
+        <div id="trendChartBody"></div>
+        <div id="trendFooter" class="trend-footer hidden"></div>
+      </div>
+
+      <!-- TRANSACTIONS + CATEGORY -->
+      <div class="lower-grid">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Transactions</h2>
+            <span id="txCount" class="text-muted"></span>
+          </div>
+          <div id="txBody"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Spending</h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-20 text-muted-light"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          </div>
+          <div id="categoryBody"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- FAB -->
+    <button id="addBtnFab" aria-label="Add transaction" class="fab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="icon-24"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+
+    <!-- MODAL -->
+    <div id="modal" class="modal hidden">
+      <div id="modalOverlay" class="modal-overlay"></div>
+      <div class="modal-panel">
+        <div class="modal-head">
+          <h2 id="modalTitle" class="card-title">New transaction</h2>
+          <button id="modalClose" aria-label="Close" class="modal-close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-20"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <form id="txForm" class="form">
+          <div class="type-toggle">
+            <button type="button" id="typeExpense" class="type-btn active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-16"><path d="M7 7h10l-5 5 5 5H7"/><path d="M7 7v10"/></svg>
+              Expense
+            </button>
+            <button type="button" id="typeIncome" class="type-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-16"><path d="M17 7H7l5 5-5 5h10"/><path d="M17 7v10"/></svg>
+              Income
+            </button>
+          </div>
+
+          <div class="field">
+            <label class="field-label">Amount</label>
+            <div class="amount-wrap">
+              <span class="amount-prefix">$</span>
+              <input type="number" id="fAmount" inputmode="decimal" step="0.01" min="0" placeholder="0.00" class="amount-input" />
+            </div>
+            <p id="errAmount" class="field-error hidden">Enter an amount greater than zero</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label">Description</label>
+            <input type="text" id="fDesc" placeholder="What was it for?" maxlength="80" class="text-input" />
+            <p id="errDesc" class="field-error hidden">Add a short description</p>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label">Category</label>
+              <select id="fCategory" class="text-input"></select>
+            </div>
+            <div class="field">
+              <label class="field-label">Date</label>
+              <input type="date" id="fDate" class="text-input" />
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="formCancel" class="btn-secondary">Cancel</button>
+            <button type="submit" id="formSubmit" class="btn-primary">
+              <span id="submitSpinner" class="spinner hidden"></span>
+              <span id="submitLabel">Add transaction</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>
