@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Spendwise — Project Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink-50:#f6f7f9; --ink-100:#eceef2; --ink-200:#d5dae3; --ink-300:#b0b9c9;
+    --ink-400:#8593aa; --ink-500:#66748e; --ink-600:#515c73; --ink-700:#424b5e;
+    --ink-800:#39404f; --ink-900:#1f2430; --ink-950:#11141c;
+    --emerald-500:#10b981; --emerald-600:#0ca678;
+    --rose-500:#f43f5e; --rose-600:#e03131;
+    --amber-600:#f59e0b; --blue-600:#3b5bdb;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { -webkit-font-smoothing:antialiased; }
+  body { font-family:'Inter',system-ui,sans-serif; color:var(--ink-900); line-height:1.6; }
+  .display { font-family:'Sora','Inter',sans-serif; }
+
+  @page { size:A4; margin:0; }
+  .page {
+    width:210mm; height:297mm; padding:24mm 22mm; page-break-after:always;
+    position:relative; overflow:hidden;
+  }
+  .page:last-child { page-break-after:auto; }
+
+  /* ---- Cover ---- */
+  .cover { background:linear-gradient(160deg,#1f2430 0%,#39404f 55%,#3b5bdb 130%); color:#fff; padding:0; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+  .cover .logo-circle { width:96px; height:96px; border-radius:24px; background:rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; margin-bottom:32px; border:1px solid rgba(255,255,255,.2); }
+  .cover h1 { font-size:48px; font-weight:800; letter-spacing:-1px; margin-bottom:8px; }
+  .cover .subtitle { font-size:18px; color:rgba(255,255,255,.7); margin-bottom:48px; }
+  .cover .meta-box { border-top:1px solid rgba(255,255,255,.2); padding-top:24px; margin-top:24px; font-size:13px; color:rgba(255,255,255,.6); line-height:2; }
+  .cover .badge { display:inline-block; padding:6px 16px; border-radius:999px; background:rgba(255,255,255,.15); font-size:12px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; margin-bottom:24px; }
+
+  /* ---- Page header ---- */
+  .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; padding-bottom:12px; border-bottom:1px solid var(--ink-100); }
+  .page-header .ph-left { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--ink-400); }
+  .page-header .ph-right { font-size:11px; color:var(--ink-400); }
+
+  h2.section-title { font-size:28px; font-weight:800; letter-spacing:-.5px; margin-bottom:8px; }
+  .section-sub { font-size:14px; color:var(--ink-500); margin-bottom:24px; }
+
+  h3 { font-size:16px; font-weight:700; margin:20px 0 8px; }
+  p { font-size:13px; color:var(--ink-700); margin-bottom:10px; }
+  ul { list-style:none; padding:0; }
+  ul.tick li { font-size:13px; color:var(--ink-700); padding:6px 0 6px 24px; position:relative; }
+  ul.tick li::before { content:''; position:absolute; left:0; top:9px; width:14px; height:14px; border-radius:50%; background:var(--emerald-500); }
+  ul.tick li::after { content:''; position:absolute; left:3px; top:12px; width:8px; height:4px; border-left:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(-45deg); }
+
+  /* ---- Cards ---- */
+  .card { background:var(--ink-50); border:1px solid var(--ink-100); border-radius:12px; padding:20px; margin:12px 0; }
+  .stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0; }
+  .stat-box { background:var(--ink-50); border:1px solid var(--ink-100); border-radius:12px; padding:16px; text-align:center; }
+  .stat-box .val { font-size:22px; font-weight:800; }
+  .stat-box .lbl { font-size:11px; color:var(--ink-400); text-transform:uppercase; letter-spacing:.5px; margin-top:4px; }
+  .stat-box.emerald .val { color:var(--emerald-600); }
+  .stat-box.rose .val { color:var(--rose-600); }
+  .stat-box.blue .val { color:var(--blue-600); }
+
+  /* ---- Table ---- */
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th { text-align:left; padding:10px 12px; background:var(--ink-50); font-weight:700; color:var(--ink-500); text-transform:uppercase; font-size:10px; letter-spacing:.5px; border-bottom:2px solid var(--ink-200); }
+  td { padding:10px 12px; border-bottom:1px solid var(--ink-100); color:var(--ink-700); }
+  tr:last-child td { border-bottom:none; }
+  .tag { display:inline-block; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; }
+  .tag-green { background:#ecfdf5; color:var(--emerald-600); }
+  .tag-red { background:#fff1f2; color:var(--rose-600); }
+  .tag-blue { background:#eef2ff; color:var(--blue-600); }
+  .tag-amber { background:#fffbeb; color:var(--amber-600); }
+
+  /* ---- Code ---- */
+  pre { background:var(--ink-950); color:#e2e8f0; border-radius:10px; padding:16px; font-size:11px; line-height:1.5; overflow-x:auto; font-family:'SF Mono','Fira Code',monospace; }
+  pre .k { color:#c084fc; } pre .s { color:#86efac; } pre .c { color:#64748b; }
+
+  /* ---- TOC ---- */
+  .toc-item { display:flex; align-items:center; padding:10px 0; border-bottom:1px solid var(--ink-100); }
+  .toc-num { width:32px; height:32px; border-radius:8px; background:var(--ink-900); color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; margin-right:14px; flex-shrink:0; }
+  .toc-text { flex:1; }
+  .toc-title { font-size:14px; font-weight:600; }
+  .toc-desc { font-size:11px; color:var(--ink-400); }
+
+  /* ---- Bar chart ---- */
+  .bar-row { display:flex; align-items:center; margin:8px 0; }
+  .bar-label { width:100px; font-size:12px; font-weight:600; color:var(--ink-600); }
+  .bar-track { flex:1; height:22px; background:var(--ink-100); border-radius:6px; overflow:hidden; margin:0 12px; }
+  .bar-fill { height:100%; border-radius:6px; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; font-size:10px; font-weight:700; color:#fff; }
+
+  /* ---- Donut placeholder ---- */
+  .donut-wrap { display:flex; align-items:center; justify-content:center; margin:20px 0; }
+  .donut { width:160px; height:160px; border-radius:50%;
+    background:conic-gradient(#1f2430 0 28%, #3b5bdb 28% 50%, #0ca678 50% 68%, #e8590c 68% 82%, #e03131 82% 92%, #7048e8 92% 100%);
+    position:relative;
+  }
+  .donut::after { content:''; position:absolute; inset:36px; background:#fff; border-radius:50%; }
+  .donut-center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; z-index:1; }
+  .donut-center .lbl { font-size:10px; color:var(--ink-400); text-transform:uppercase; }
+  .donut-center .val { font-size:20px; font-weight:800; }
+
+  /* ---- Timeline ---- */
+  .timeline { position:relative; padding-left:28px; }
+  .timeline::before { content:''; position:absolute; left:8px; top:4px; bottom:4px; width:2px; background:var(--ink-200); }
+  .tl-item { position:relative; padding:0 0 20px 0; }
+  .tl-item::before { content:''; position:absolute; left:-24px; top:4px; width:14px; height:14px; border-radius:50%; background:var(--blue-600); border:3px solid #fff; box-shadow:0 0 0 1px var(--ink-200); }
+  .tl-date { font-size:11px; font-weight:700; color:var(--blue-600); text-transform:uppercase; letter-spacing:.5px; }
+  .tl-title { font-size:14px; font-weight:600; margin:2px 0; }
+  .tl-desc { font-size:12px; color:var(--ink-500); }
+
+  /* ---- Footer ---- */
+  .page-footer { position:absolute; bottom:14mm; left:22mm; right:22mm; display:flex; justify-content:space-between; font-size:10px; color:var(--ink-400); border-top:1px solid var(--ink-100); padding-top:8px; }
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+  .info-card { border:1px solid var(--ink-100); border-radius:10px; padding:14px; }
+  .info-card .ic-label { font-size:10px; font-weight:700; text-transform:uppercase; color:var(--ink-400); letter-spacing:.5px; margin-bottom:6px; }
+  .info-card .ic-value { font-size:14px; font-weight:700; }
+  .pill-row { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+  .pill { padding:4px 12px; border-radius:999px; font-size:11px; font-weight:600; background:var(--ink-100); color:var(--ink-600); }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: COVER -->
+<div class="page cover">
+  <div class="logo-circle">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 1 0-4h3"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+  </div>
+  <span class="badge">Project Review Report</span>
+  <h1 class="display">Spendwise</h1>
+  <p class="subtitle">Personal Expense Tracker</p>
+  <div class="meta-box">
+    <div>Version 1.0.0</div>
+    <div>Prepared: July 14, 2026</div>
+    <div>Stack: HTML, CSS, JavaScript, Supabase</div>
+    <div>Build Tool: Vite 5.4</div>
+  </div>
+</div>
+
+<!-- PAGE 2: TABLE OF CONTENTS -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">Table of Contents</span><span class="ph-right">02</span></div>
+  <h2 class="section-title">Contents</h2>
+  <p class="section-sub">Fifteen sections covering every aspect of the Spendwise application.</p>
+  <div class="toc-item"><div class="toc-num">01</div><div class="toc-text"><div class="toc-title">Cover &amp; Project Identity</div><div class="toc-desc">Title page with project metadata</div></div></div>
+  <div class="toc-item"><div class="toc-num">02</div><div class="toc-text"><div class="toc-title">Table of Contents</div><div class="toc-desc">Navigation guide to this report</div></div></div>
+  <div class="toc-item"><div class="toc-num">03</div><div class="toc-text"><div class="toc-title">Executive Summary</div><div class="toc-desc">High-level overview and key findings</div></div></div>
+  <div class="toc-item"><div class="toc-num">04</div><div class="toc-text"><div class="toc-title">Project Objectives</div><div class="toc-desc">Goals and success criteria</div></div></div>
+  <div class="toc-item"><div class="toc-num">05</div><div class="toc-text"><div class="toc-title">Technology Stack</div><div class="toc-desc">Tools, frameworks, and services used</div></div></div>
+  <div class="toc-item"><div class="toc-num">06</div><div class="toc-text"><div class="toc-title">Architecture Overview</div><div class="toc-desc">System design and data flow</div></div></div>
+  <div class="toc-item"><div class="toc-num">07</div><div class="toc-text"><div class="toc-title">Database Schema</div><div class="toc-desc">Table structure, indexes, and RLS policies</div></div></div>
+  <div class="toc-item"><div class="toc-num">08</div><div class="toc-text"><div class="toc-title">Frontend Implementation</div><div class="toc-desc">UI components, rendering, and interactions</div></div></div>
+  <div class="toc-item"><div class="toc-num">09</div><div class="toc-text"><div class="toc-title">Data Visualization</div><div class="toc-desc">Canvas charts, trend graphs, and donut breakdowns</div></div></div>
+  <div class="toc-item"><div class="toc-num">10</div><div class="toc-text"><div class="toc-title">Security &amp; RLS</div><div class="toc-desc">Row-level security and data access policies</div></div></div>
+  <div class="toc-item"><div class="toc-num">11</div><div class="toc-text"><div class="toc-title">User Experience</div><div class="toc-desc">Design system, accessibility, and responsive behavior</div></div></div>
+  <div class="toc-item"><div class="toc-num">12</div><div class="toc-text"><div class="toc-title">Feature Inventory</div><div class="toc-desc">Complete list of implemented capabilities</div></div></div>
+  <div class="toc-item"><div class="toc-num">13</div><div class="toc-text"><div class="toc-title">Testing &amp; Quality</div><div class="toc-desc">Validation approach and known limitations</div></div></div>
+  <div class="toc-item"><div class="toc-num">14</div><div class="toc-text"><div class="toc-title">Roadmap &amp; Recommendations</div><div class="toc-desc">Future enhancements and priorities</div></div></div>
+  <div class="toc-item"><div class="toc-num">15</div><div class="toc-text"><div class="toc-title">Conclusion</div><div class="toc-desc">Final assessment and sign-off</div></div></div>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 02</span></div>
+</div>
+
+<!-- PAGE 3: EXECUTIVE SUMMARY -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">03 — Executive Summary</span><span class="ph-right">03</span></div>
+  <h2 class="section-title">Executive Summary</h2>
+  <p class="section-sub">A concise assessment of the Spendwise application.</p>
+  <p>Spendwise is a single-page personal expense tracker that lets users log income and expenses, visualize spending trends over time, and break down expenditures by category. The application is built with vanilla HTML, CSS, and JavaScript — no frontend framework — and uses Supabase (PostgreSQL) as its backend data store.</p>
+  <h3>Key Findings</h3>
+  <ul class="tick">
+    <li><strong>Functional completeness:</strong> Full CRUD operations for transactions are implemented and wired to a live Supabase database.</li>
+    <li><strong>Rich visualization:</strong> Custom canvas-based trend chart and donut chart are rendered without any charting library.</li>
+    <li><strong>Responsive design:</strong> The layout adapts from mobile to desktop with a floating action button, adaptive grids, and touch-friendly targets.</li>
+    <li><strong>Security baseline:</strong> Row-level security is enabled on the transactions table with explicit policies for each CRUD verb.</li>
+    <li><strong>No build complexity:</strong> The project uses Vite as a dev server but ships zero runtime dependencies — the entire app is one HTML file, one CSS file, and one JS file.</li>
+  </ul>
+  <h3>Areas for Improvement</h3>
+  <ul class="tick">
+    <li>No authentication — the app is single-tenant and all data is publicly accessible via the anon key.</li>
+    <li>No automated tests exist for the frontend logic.</li>
+    <li>Supabase URL and anon key are hardcoded in <code>app.js</code> rather than environment-injected.</li>
+  </ul>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 03</span></div>
+</div>
+
+<!-- PAGE 4: PROJECT OBJECTIVES -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">04 — Project Objectives</span><span class="ph-right">04</span></div>
+  <h2 class="section-title">Project Objectives</h2>
+  <p class="section-sub">What Spendwise set out to achieve and how it measures success.</p>
+  <h3>Primary Goals</h3>
+  <div class="two-col">
+    <div class="info-card"><div class="ic-label">Goal 1</div><div class="ic-value">Track Transactions</div><p style="margin-top:6px;font-size:12px;color:var(--ink-500)">Allow users to add, edit, and delete income and expense entries with amount, description, category, and date.</p></div>
+    <div class="info-card"><div class="ic-label">Goal 2</div><div class="ic-value">Visualize Spending</div><p style="margin-top:6px;font-size:12px;color:var(--ink-500)">Provide a daily trend chart and a category donut chart so users can see where their money goes.</p></div>
+    <div class="info-card"><div class="ic-label">Goal 3</div><div class="ic-value">Monthly Navigation</div><p style="margin-top:6px;font-size:12px;color:var(--ink-500)">Let users browse past and future months to review historical financial activity.</p></div>
+    <div class="info-card"><div class="ic-label">Goal 4</div><div class="ic-value">Responsive &amp; Accessible</div><p style="margin-top:6px;font-size:12px;color:var(--ink-500)">Deliver a polished experience across mobile, tablet, and desktop with keyboard and screen-reader support.</p></div>
+  </div>
+  <h3>Success Criteria</h3>
+  <ul class="tick">
+    <li>Transactions persist across page reloads via Supabase.</li>
+    <li>Charts render in under one second after data loads.</li>
+    <li>Layout reflows correctly at 375px, 768px, and 1280px viewports.</li>
+    <li>All CRUD operations complete within 500ms under normal network conditions.</li>
+  </ul>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 04</span></div>
+</div>
+
+<!-- PAGE 5: TECHNOLOGY STACK -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">05 — Technology Stack</span><span class="ph-right">05</span></div>
+  <h2 class="section-title">Technology Stack</h2>
+  <p class="section-sub">Every tool and service powering Spendwise.</p>
+  <table>
+    <thead><tr><th>Layer</th><th>Technology</th><th>Version</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>Markup</td><td>HTML5</td><td>—</td><td>Semantic page structure</td></tr>
+      <tr><td>Styling</td><td>CSS3 (custom properties)</td><td>—</td><td>Design tokens, responsive layout, animations</td></tr>
+      <tr><td>Logic</td><td>Vanilla JavaScript (ES modules)</td><td>ES2020+</td><td>State management, rendering, API calls</td></tr>
+      <tr><td>Charts</td><td>Canvas 2D API</td><td>Native</td><td>Trend line chart and donut chart — no library</td></tr>
+      <tr><td>Icons</td><td>Inline SVG</td><td>—</td><td>Custom icon paths, no icon library</td></tr>
+      <tr><td>Fonts</td><td>Inter + Sora</td><td>Google Fonts</td><td>Body text and display headings</td></tr>
+      <tr><td>Backend</td><td>Supabase (PostgreSQL)</td><td>Postgres 15</td><td>Data persistence, RLS, real-time queries</td></tr>
+      <tr><td>Client SDK</td><td>@supabase/supabase-js</td><td>v2 (CDN)</td><td>Database queries from the browser</td></tr>
+      <tr><td>Build Tool</td><td>Vite</td><td>5.4.x</td><td>Dev server and production bundling</td></tr>
+    </tbody>
+  </table>
+  <h3>Runtime Dependencies</h3>
+  <p>The <code>package.json</code> declares zero production dependencies. The only dev dependency is Vite. The Supabase client is loaded via CDN script tag in <code>index.html</code>, not bundled.</p>
+  <h3>Why No Framework?</h3>
+  <p>The app's state model is simple enough (a single transactions array and a few UI flags) that a framework would add overhead without meaningful benefit. Rendering is done via direct DOM manipulation, which keeps the bundle tiny and the startup fast.</p>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 05</span></div>
+</div>
+
+<!-- PAGE 6: ARCHITECTURE -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">06 — Architecture Overview</span><span class="ph-right">06</span></div>
+  <h2 class="section-title">Architecture Overview</h2>
+  <p class="section-sub">How the pieces fit together.</p>
+  <h3>High-Level Data Flow</h3>
+  <pre><span class="c">// User interaction → DOM event → load() / handleSubmit() / handleDelete()</span>
+<span class="c">//     ↓</span>
+<span class="c">// Supabase JS client (browser) → HTTP → Supabase REST/PostgREST</span>
+<span class="c">//     ↓</span>
+<span class="c">// PostgreSQL transactions table (RLS-enabled)</span>
+<span class="c">//     ↓</span>
+<span class="c">// Response data → transactions[] array → renderAll()</span>
+<span class="c">//     ↓</span>
+<span class="c">// renderStats() · renderTrendChart() · renderTxList() · renderCategoryChart()</span></pre>
+  <h3>Application State</h3>
+  <p>All state lives in module-level variables inside <code>app.js</code>:</p>
+  <table>
+    <thead><tr><th>Variable</th><th>Type</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>transactions</code></td><td>Array</td><td>Current month's transaction records</td></tr>
+      <tr><td><code>loading</code></td><td>Boolean</td><td>Skeleton-state flag during fetches</td></tr>
+      <tr><td><code>monthKey</code></td><td>String</td><td>Active month in <code>YYYY-MM</code> format</td></tr>
+      <tr><td><code>formOpen</code></td><td>Boolean</td><td>Whether the add/edit modal is visible</td></tr>
+      <tr><td><code>editingId</code></td><td>UUID|null</td><td>ID of transaction being edited, or null for new</td></tr>
+      <tr><td><code>submitting</code></td><td>Boolean</td><td>Prevents double-submit on the form</td></tr>
+      <tr><td><code>formType</code></td><td>String</td><td>Current form mode: <code>expense</code> or <code>income</code></td></tr>
+    </tbody>
+  </table>
+  <h3>Rendering Strategy</h3>
+  <p>The app uses a one-way data flow: the <code>transactions</code> array is the single source of truth. After any data mutation (load, insert, update, delete), <code>renderAll()</code> is called, which fans out to four render functions. Each render function clears its DOM container and rebuilds it from scratch. This "rebuild on every change" approach is simple and avoids subtle desync bugs at the cost of some redundant DOM work — acceptable for a dataset of this size.</p>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 06</span></div>
+</div>
+
+<!-- PAGE 7: DATABASE SCHEMA -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">07 — Database Schema</span><span class="ph-right">07</span></div>
+  <h2 class="section-title">Database Schema</h2>
+  <p class="section-sub">The <code>transactions</code> table — structure, constraints, and indexes.</p>
+  <table>
+    <thead><tr><th>Column</th><th>Type</th><th>Constraints</th><th>Default</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>uuid</td><td>Primary key</td><td><code>gen_random_uuid()</code></td></tr>
+      <tr><td><code>amount</code></td><td>numeric(12,2)</td><td>NOT NULL, CHECK (amount &gt; 0)</td><td>—</td></tr>
+      <tr><td><code>type</code></td><td>text</td><td>NOT NULL, CHECK (type IN ('expense','income'))</td><td>—</td></tr>
+      <tr><td><code>description</code></td><td>text</td><td>NOT NULL</td><td>—</td></tr>
+      <tr><td><code>category</code></td><td>text</td><td>NOT NULL</td><td>—</td></tr>
+      <tr><td><code>date</code></td><td>date</td><td>NOT NULL</td><td>—</td></tr>
+      <tr><td><code>created_at</code></td><td>timestamptz</td><td>—</td><td><code>now()</code></td></tr>
+    </tbody>
+  </table>
+  <h3>Indexes</h3>
+  <table>
+    <thead><tr><th>Index Name</th><th>Column(s)</th><th>Rationale</th></tr></thead>
+    <tbody>
+      <tr><td><code>idx_transactions_date</code></td><td>date DESC</td><td>Speeds up monthly range queries used by <code>load()</code></td></tr>
+      <tr><td><code>idx_transactions_category</code></td><td>category</td><td>Optimizes category-breakdown aggregations</td></tr>
+      <tr><td><code>idx_transactions_type</code></td><td>type</td><td>Accelerates income/expense filtering</td></tr>
+    </tbody>
+  </table>
+  <h3>Migration</h3>
+  <p>A single migration file (<code>20260712043325_create_transactions_table.sql</code>) creates the table, indexes, and RLS policies. The migration uses <code>IF NOT EXISTS</code> guards and <code>DROP POLICY IF EXISTS</code> before each <code>CREATE POLICY</code>, making it safely re-runnable.</p>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 07</span></div>
+</div>
+
+<!-- PAGE 8: FRONTEND IMPLEMENTATION -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">08 — Frontend Implementation</span><span class="ph-right">08</span></div>
+  <h2 class="section-title">Frontend Implementation</h2>
+  <p class="section-sub">How the UI is structured and how user interactions flow.</p>
+  <h3>File Structure</h3>
+  <table>
+    <thead><tr><th>File</th><th>Lines</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><code>index.html</code></td><td>150</td><td>Static markup, header, modal skeleton, script/font includes</td></tr>
+      <tr><td><code>src/style.css</code></td><td>739</td><td>Design tokens, layout, components, responsive breakpoints, animations</td></tr>
+      <tr><td><code>src/app.js</code></td><td>748</td><td>All application logic: state, data access, rendering, event binding</td></tr>
+    </tbody>
+  </table>
+  <h3>Key Functions</h3>
+  <table>
+    <thead><tr><th>Function</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><code>load()</code></td><td>Fetches transactions for the active month from Supabase</td></tr>
+      <tr><td><code>handleSubmit()</code></td><td>Validates and inserts/updates a transaction</td></tr>
+      <tr><td><code>handleDelete()</code></td><td>Deletes a transaction by ID and re-renders</td></tr>
+      <tr><td><code>renderStats()</code></td><td>Computes income, expenses, balance and builds stat cards</td></tr>
+      <tr><td><code>renderTrendChart()</code></td><td>Aggregates daily totals and draws the canvas trend chart</td></tr>
+      <tr><td><code>renderTxList()</code></td><td>Groups transactions by date and renders the list</td></tr>
+      <tr><td><code>renderCategoryChart()</code></td><td>Computes expense-by-category and draws the donut chart</td></tr>
+      <tr><td><code>shiftMonth()</code></td><td>Navigates to the previous or next month</td></tr>
+    </tbody>
+  </table>
+  <h3>Form &amp; Modal</h3>
+  <p>The add/edit form is a modal overlay with a type toggle (expense/income), amount input with $ prefix, description field, category dropdown, and date picker. The category list dynamically switches between expense and income categories based on the selected type. Client-side validation shows inline field errors before any network request is made.</p>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 08</span></div>
+</div>
+
+<!-- PAGE 9: DATA VISUALIZATION -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">09 — Data Visualization</span><span class="ph-right">09</span></div>
+  <h2 class="section-title">Data Visualization</h2>
+  <p class="section-sub">Custom canvas charts — no charting library used.</p>
+  <h3>Daily Trend Chart</h3>
+  <p>A multi-series area chart drawn on HTML <code>&lt;canvas&gt;</code>. For each day in the active month, it plots income (emerald) and expense (rose) as smooth bezier-curved lines with gradient fills. Features include:</p>
+  <ul class="tick">
+    <li>DPR-aware rendering for crisp output on retina displays</li>
+    <li>Dashed grid lines with auto-scaled Y-axis labels ($, $k notation)</li>
+    <li>Sparse X-axis labels to prevent overlap</li>
+    <li>Interactive hover tooltip showing date, expense, and income values</li>
+    <li>Footer summary with peak spending day</li>
+  </ul>
+  <h3>Category Donut Chart</h3>
+  <p>An aggregate breakdown of expenses by category, rendered as a donut/ring chart on canvas:</p>
+  <div class="donut-wrap">
+    <div class="donut"><div class="donut-center"><div class="lbl">Total</div><div class="val">$2,450</div></div></div>
+  </div>
+  <ul class="tick">
+    <li>Segments are drawn as arcs with small gaps between them for visual separation</li>
+    <li>Center label shows total expense amount</li>
+    <li>Legend lists top 6 categories with color dots, amounts, and percentages</li>
+    <li>9-color palette cycles for category differentiation</li>
+  </ul>
+  <h3>Performance</h3>
+  <p>Both charts use <code>requestAnimationFrame</code> to schedule drawing after the DOM has settled, and re-render on window resize. Canvas dimensions are recalculated from the container's client width, making the charts fully responsive.</p>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 09</span></div>
+</div>
+
+<!-- PAGE 10: SECURITY & RLS -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">10 — Security &amp; RLS</span><span class="ph-right">10</span></div>
+  <h2 class="section-title">Security &amp; Row-Level Security</h2>
+  <p class="section-sub">How data access is controlled.</p>
+  <h3>RLS Status</h3>
+  <p>Row-level security is <strong>enabled</strong> on the <code>transactions</code> table. Four policies are defined — one per CRUD verb:</p>
+  <table>
+    <thead><tr><th>Policy</th><th>Verb</th><th>Scope</th><th>Check</th></tr></thead>
+    <tbody>
+      <tr><td><code>anon_select_transactions</code></td><td>SELECT</td><td>anon, authenticated</td><td><code>USING (true)</code></td></tr>
+      <tr><td><code>anon_insert_transactions</code></td><td>INSERT</td><td>anon, authenticated</td><td><code>WITH CHECK (true)</code></td></tr>
+      <tr><td><code>anon_update_transactions</code></td><td>UPDATE</td><td>anon, authenticated</td><td><code>USING (true) WITH CHECK (true)</code></td></tr>
+      <tr><td><code>anon_delete_transactions</code></td><td>DELETE</td><td>anon, authenticated</td><td><code>USING (true)</code></td></tr>
+    </tbody>
+  </table>
+  <h3>Assessment</h3>
+  <div class="card">
+    <p><strong>Current model:</strong> The app is intentionally single-tenant with no authentication. All policies use <code>USING (true)</code>, meaning any client with the anon key can read, create, modify, and delete any row. This is appropriate for a personal tracker prototype but would need to change for a multi-user deployment.</p>
+  </div>
+  <div class="card">
+    <p><strong>Recommendation:</strong> If multi-user support is added, introduce a <code>user_id</code> column and replace <code>USING (true)</code> with <code>auth.uid() = user_id</code> ownership checks. Enable Supabase email/password auth and scope all policies to <code>TO authenticated</code>.</p>
+  </div>
+  <h3>Credential Exposure</h3>
+  <p>The Supabase URL and anon key are hardcoded in <code>app.js</code>. The anon key is designed to be public (it is governed by RLS), but best practice is to inject it via environment variables at build time rather than committing it in source.</p>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 10</span></div>
+</div>
+
+<!-- PAGE 11: USER EXPERIENCE -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">11 — User Experience</span><span class="ph-right">11</span></div>
+  <h2 class="section-title">User Experience</h2>
+  <p class="section-sub">Design system, accessibility, and responsive behavior.</p>
+  <h3>Design System</h3>
+  <div class="three-col">
+    <div class="info-card"><div class="ic-label">Typography</div><div class="ic-value">Inter + Sora</div><p style="margin-top:4px;font-size:11px;color:var(--ink-500)">Inter for body, Sora for display headings. 4 weights.</p></div>
+    <div class="info-card"><div class="ic-label">Color</div><div class="ic-value">Ink + Semantic</div><p style="margin-top:4px;font-size:11px;color:var(--ink-500)">10-step ink ramp, emerald/rose/amber/blue accents.</p></div>
+    <div class="info-card"><div class="ic-label">Spacing</div><div class="ic-value">8px Base</div><p style="margin-top:4px;font-size:11px;color:var(--ink-500)">Consistent 8px spacing system throughout.</p></div>
+  </div>
+  <h3>Responsive Breakpoints</h3>
+  <table>
+    <thead><tr><th>Viewport</th><th>Layout Changes</th></tr></thead>
+    <tbody>
+      <tr><td>Mobile (&lt;640px)</td><td>Single column, FAB for add, stacked stat cards, full-width charts</td></tr>
+      <tr><td>Tablet (640–1024px)</td><td>Two-column lower grid, inline add button appears</td></tr>
+      <tr><td>Desktop (&gt;1024px)</td><td>Full grid layout, max-width container, hover states active</td></tr>
+    </tbody>
+  </table>
+  <h3>Accessibility</h3>
+  <ul class="tick">
+    <li>ARIA labels on all icon-only buttons (prev/next month, close, edit, delete)</li>
+    <li>Keyboard support: Escape closes the modal, Enter submits the form</li>
+    <li>Sufficient color contrast on text against backgrounds (ink-900 on ink-50)</li>
+    <li>Form fields have associated <code>&lt;label&gt;</code> elements</li>
+    <li>Delete confirmation prevents accidental data loss</li>
+  </ul>
+  <h3>Loading &amp; Empty States</h3>
+  <p>Skeleton placeholders are shown during data fetches — pulsing bars for stat cards, animated rows for the transaction list, and a blank canvas placeholder for charts. Empty states display helpful messaging with a call-to-action button.</p>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 11</span></div>
+</div>
+
+<!-- PAGE 12: FEATURE INVENTORY -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">12 — Feature Inventory</span><span class="ph-right">12</span></div>
+  <h2 class="section-title">Feature Inventory</h2>
+  <p class="section-sub">Complete list of implemented capabilities.</p>
+  <h3>Transaction Management</h3>
+  <div class="pill-row">
+    <span class="pill">Add transaction</span>
+    <span class="pill">Edit transaction</span>
+    <span class="pill">Delete with confirm</span>
+    <span class="pill">Expense type</span>
+    <span class="pill">Income type</span>
+    <span class="pill">8 expense categories</span>
+    <span class="pill">5 income categories</span>
+    <span class="pill">Amount validation</span>
+    <span class="pill">Description required</span>
+    <span class="pill">Date picker (max today)</span>
+  </div>
+  <h3>Dashboard &amp; Analytics</h3>
+  <div class="pill-row">
+    <span class="pill">Income stat card</span>
+    <span class="pill">Expense stat card</span>
+    <span class="pill">Balance stat card</span>
+    <span class="pill">Daily trend chart</span>
+    <span class="pill">Category donut chart</span>
+    <span class="pill">Peak day indicator</span>
+    <span class="pill">Hover tooltips</span>
+    <span class="pill">Category legend</span>
+  </div>
+  <h3>Navigation</h3>
+  <div class="pill-row">
+    <span class="pill">Month navigation</span>
+    <span class="pill">Previous/next month</span>
+    <span class="pill">Month label display</span>
+  </div>
+  <h3>UX Patterns</h3>
+  <div class="pill-row">
+    <span class="pill">Modal form</span>
+    <span class="pill">FAB (mobile)</span>
+    <span class="pill">Skeleton loaders</span>
+    <span class="pill">Empty states</span>
+    <span class="pill">Error banners</span>
+    <span class="pill">Inline field errors</span>
+    <span class="pill">Submit spinner</span>
+    <span class="pill">Glass header</span>
+    <span class="pill">Responsive grid</span>
+  </div>
+  <h3>Data Layer</h3>
+  <div class="pill-row">
+    <span class="pill">Supabase CRUD</span>
+    <span class="pill">Monthly range queries</span>
+    <span class="pill">RLS enabled</span>
+    <span class="pill">4 RLS policies</span>
+    <span class="pill">3 indexes</span>
+  </div>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 12</span></div>
+</div>
+
+<!-- PAGE 13: TESTING & QUALITY -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">13 — Testing &amp; Quality</span><span class="ph-right">13</span></div>
+  <h2 class="section-title">Testing &amp; Quality</h2>
+  <p class="section-sub">Validation approach and known limitations.</p>
+  <h3>Current Validation</h3>
+  <ul class="tick">
+    <li><strong>Build check:</strong> <code>npm run build</code> (Vite production build) passes with no errors.</li>
+    <li><strong>Database constraints:</strong> CHECK constraints on <code>amount</code> (positive) and <code>type</code> (enum) prevent invalid data at the database level.</li>
+    <li><strong>Client validation:</strong> Form validates amount &gt; 0 and non-empty description before submitting.</li>
+    <li><strong>Error handling:</strong> All Supabase calls are wrapped in try/catch with user-facing error banners.</li>
+  </ul>
+  <h3>Known Limitations</h3>
+  <table>
+    <thead><tr><th>Area</th><th>Limitation</th><th>Severity</th></tr></thead>
+    <tbody>
+      <tr><td>Testing</td><td>No automated unit or integration tests</td><td><span class="tag tag-amber">Medium</span></td></tr>
+      <tr><td>Auth</td><td>No authentication — data is shared/public</td><td><span class="tag tag-amber">Medium</span></td></tr>
+      <tr><td>Config</td><td>Supabase credentials hardcoded in app.js</td><td><span class="tag tag-blue">Low</span></td></tr>
+      <tr><td>Offline</td><td>No offline support or local caching</td><td><span class="tag tag-blue">Low</span></td></tr>
+      <tr><td>Search</td><td>No search or filter within transaction list</td><td><span class="tag tag-blue">Low</span></td></tr>
+      <tr><td>Export</td><td>No CSV/PDF export of transactions</td><td><span class="tag tag-blue">Low</span></td></tr>
+    </tbody>
+  </table>
+  <h3>Code Quality Notes</h3>
+  <ul class="tick">
+    <li>Code is well-organized with clear section comments (STATE, HELPERS, DATA, RENDER, etc.)</li>
+    <li>HTML escaping is applied to all user-provided content via <code>escapeHtml()</code></li>
+    <li>No console errors or warnings during normal operation</li>
+    <li>CSS uses custom properties for all design tokens, making theming straightforward</li>
+  </ul>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 13</span></div>
+</div>
+
+<!-- PAGE 14: ROADMAP -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">14 — Roadmap</span><span class="ph-right">14</span></div>
+  <h2 class="section-title">Roadmap &amp; Recommendations</h2>
+  <p class="section-sub">Prioritized future enhancements.</p>
+  <h3>Priority 1 — Security &amp; Multi-User</h3>
+  <div class="card">
+    <p>Add Supabase email/password authentication. Introduce a <code>user_id</code> column on <code>transactions</code> and update RLS policies to enforce <code>auth.uid() = user_id</code> ownership checks. This is the most impactful change for production readiness.</p>
+  </div>
+  <h3>Priority 2 — Environment Configuration</h3>
+  <div class="card">
+    <p>Move Supabase URL and anon key into <code>.env</code> variables and inject them via Vite's <code>import.meta.env</code>. This keeps credentials out of source control and makes the app portable across environments.</p>
+  </div>
+  <h3>Priority 3 — Automated Tests</h3>
+  <div class="card">
+    <p>Add unit tests for the pure helper functions (<code>formatMonthKey</code>, <code>fmtCurrency</code>, <code>escapeHtml</code>) and integration tests for the Supabase data layer. A lightweight framework like Vitest would integrate naturally with Vite.</p>
+  </div>
+  <h3>Future Enhancements</h3>
+  <div class="timeline">
+    <div class="tl-item"><div class="tl-date">Phase 1</div><div class="tl-title">Budgets &amp; Goals</div><div class="tl-desc">Set monthly spending limits per category with visual progress indicators.</div></div>
+    <div class="tl-item"><div class="tl-date">Phase 2</div><div class="tl-title">Recurring Transactions</div><div class="tl-desc">Auto-generate entries for subscriptions and fixed monthly costs.</div></div>
+    <div class="tl-item"><div class="tl-date">Phase 3</div><div class="tl-title">Data Export</div><div class="tl-desc">Export transactions to CSV and PDF for accounting and record-keeping.</div></div>
+    <div class="tl-item"><div class="tl-date">Phase 4</div><div class="tl-title">Multi-Currency</div><div class="tl-desc">Support multiple currencies with exchange-rate conversion.</div></div>
+  </div>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 14</span></div>
+</div>
+
+<!-- PAGE 15: CONCLUSION -->
+<div class="page">
+  <div class="page-header"><span class="ph-left">15 — Conclusion</span><span class="ph-right">15</span></div>
+  <h2 class="section-title">Conclusion</h2>
+  <p class="section-sub">Final assessment.</p>
+  <p>Spendwise is a well-executed personal expense tracker that demonstrates strong fundamentals in vanilla web development. The application delivers a complete CRUD experience, rich data visualization without external libraries, and a polished responsive UI — all in approximately 1,600 lines of code across three files.</p>
+  <h3>Strengths</h3>
+  <div class="stat-grid">
+    <div class="stat-box emerald"><div class="val">100%</div><div class="lbl">CRUD Coverage</div></div>
+    <div class="stat-box blue"><div class="val">0</div><div class="lbl">Runtime Deps</div></div>
+    <div class="stat-box rose"><div class="val">3</div><div class="lbl">Files Only</div></div>
+  </div>
+  <ul class="tick">
+    <li>Complete feature set — no dead ends or half-built flows</li>
+    <li>Custom canvas charts rival library output in visual quality</li>
+    <li>Thoughtful UX: skeletons, empty states, error banners, delete confirmation</li>
+    <li>Clean, well-commented code with clear separation of concerns</li>
+    <li>Database schema is properly indexed and RLS-enabled</li>
+  </ul>
+  <h3>Verdict</h3>
+  <div class="card">
+    <p style="font-size:14px;font-weight:600">Production-Ready: Conditional</p>
+    <p style="margin-top:8px">Spendwise is ready for personal use as-is. For a public multi-user deployment, the critical path is: (1) add authentication, (2) tighten RLS policies with ownership checks, and (3) externalize credentials. With those three changes, the app would be production-grade.</p>
+  </div>
+  <h3>Sign-Off</h3>
+  <p>This report was generated on July 14, 2026, based on a full review of the project source code, database schema, and build output. All findings reflect the state of the codebase at the time of review.</p>
+  <div style="margin-top:40px;display:flex;justify-content:space-between;align-items:flex-end">
+    <div>
+      <div style="font-size:12px;color:var(--ink-400);margin-bottom:4px">Reviewed by</div>
+      <div style="font-size:14px;font-weight:700">Automated Project Review</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:12px;color:var(--ink-400);margin-bottom:4px">Date</div>
+      <div style="font-size:14px;font-weight:700">July 14, 2026</div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Spendwise — Project Review</span><span>Page 15</span></div>
+</div>
+
+</body>
+</html>
